@@ -41,3 +41,20 @@ characters. The symbol "^" marks the start of a read, "$" the end of a read, del
 Yes G
 This output can be used for a simple consensus calling. For a more sophisticated variant calling method,
 go to the next section.
+
+## Exercise 3: Generating genotype likelihoods and variant calling
+The mpileup command (traditionally in samtools , now moved to bcftools ) can be used to generate genotype
+likelihoods. Try to run the following command (press " q " to quit the viewing mode)
+```
+bcftools mpileup -f GRCm38_68.19.fa A_J.bam | less -S
+```
+This generates an intermediate output which contains genotype likelihoods and other raw information
+necessary for calling. This output is usually streamed directly to the caller like this
+bcftools mpileup -f GRCm38_68.19.fa A_J.bam | bcftools call -m | less -S
+## Q: What option should be added to only print out variant sites? Hint: check the program usage by running bcftools call without any parameters.
+```
+
+The INFO and FORMAT fields of each entry tells us something about the data at the position in the genome. It
+consists of a set of key-value pairs with the tags being explained in the header of the VCF file (see the ##INFO
+and ##FORMAT lines in the header)
+
