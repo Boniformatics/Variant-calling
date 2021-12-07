@@ -35,3 +35,9 @@ Each line corresponds to a position on the genome. The columns are: chromosome, 
 read depth, read bases ("." or "," indicates match on the forward or reverse strand; ACGTN and acgtn a
 mismatch on the forward and the reverse strand) and the final column is the base qualities encoded into
 characters. The symbol "^" marks the start of a read, "$" the end of a read, deleted bases are represented as
+## Q: What is the read depth at position 10001994? (Rather than scrolling to the position, use the substring searching capabilities of less : press / , then type 10001994 and enter to find the position.)
+66
+## Q: What is the reference base? Are there any non-reference bases?
+Yes G
+This output can be used for a simple consensus calling. For a more sophisticated variant calling method,
+go to the next section.
