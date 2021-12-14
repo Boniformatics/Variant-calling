@@ -33,3 +33,45 @@ non-reference bases-Gg
 
 This output can be used for a simple consensus calling. For a more sophisticated variant calling method,
 go to the next section.
+
+## Exercise 3: Generating genotype likelihoods and variant calling
+The mpileup command (traditionally in samtools , now moved to bcftools ) can be used to generate genotype
+likelihoods. Try to run the following command (press " q " to quit the viewing mode)
+```
+bcftools mpileup -f GRCm38_68.19.fa A_J.bam | less -S
+```
+This generates an intermediate output which contains genotype likelihoods and other raw information
+necessary for calling. This output is usually streamed directly to the caller like this
+```
+bcftools mpileup -f GRCm38_68.19.fa A_J.bam | bcftools call -m | less -S
+```
+```
+## bcftools annotate -x INFO/vep file.vcf.gz | bcftools view --types snps --regions-file bedfile -o output_file - O z
+``` 
+
+```
+bcftools mpileup -f GRCm38_68.19.fa A_J.bam | bcftools call -mv | less -S  #view variant regions only
+```
+Let mpileup output more information. For example we can ask it to add the FORMAT/AD tag which informs
+about the number of high-quality reads that support alleles listed in REF and ALT columns. The list of all
+available tags can be printed with " bcftools mpileup -a? ".
+Now let's run the variant calling again, this time adding the -a AD option. We will also add the -Ou option to
+mpileup so that it streams a binary uncompressed BCF into call . This is to avoid the unnecessary CPU
+overhead of formatting the internal binary format into plain text VCF only to be immediately formatted back to
+the internal binary format again:
+```
+bcftools mpileup -a AD -f GRCm38_68.19.fa A_J.bam -Ou | bcftools call -mv -o out.vcf
+```
+Examine the VCF file output using the unix command less :
+less -S out.vcf
+## Q: What is the reference and SNP base at position 10001994?
+69
+
+## Q: What is the total read depth at position 10001994?
+69
+
+## Q: What is the number of high-quality reads supporting the SNP call at position 10001994? How many reads support the reference allele?
+66 reads support SNP
+0 reads support reference allele
+## Q: What sort of event is happening at position 10003649?
+Insertion in alternate sequence. 5  insetions(
