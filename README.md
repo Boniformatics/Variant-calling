@@ -75,3 +75,7 @@ less -S out.vcf
 0 reads support reference allele
 ## Q: What sort of event is happening at position 10003649?
 Insertion in alternate sequence. 5  insetions(
+
+
+### Exercise 4: Variant filtering
+In the series of commands we will learn how to filter and extract information from VCFs. Most of the bcftools commands accept the -i, --include and -e, --exclude options (documentation) which will come handy when filtering using fixed thresholds. We will estimate the quality of the callset by calculating the transition/transversion ratio.
