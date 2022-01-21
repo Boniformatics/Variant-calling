@@ -33,6 +33,12 @@ non-reference bases-Gg
 
 This output can be used for a simple consensus calling. For a more sophisticated variant calling method,
 go to the next section.
+## using vcftools
+## i) Allele frequency 
+```
+vcftools --vcf A_J.vcf --freq --chr 19 --out chr19_analysis
+```
+
 
 ## Exercise 3: Generating genotype likelihoods and variant calling
 The mpileup command (traditionally in samtools , now moved to bcftools ) can be used to generate genotype
@@ -48,13 +54,13 @@ bcftools mpileup -f GRCm38_68.19.fa A_J.bam | bcftools call -m | less -S
 ```
 ## bcftools annotate -x INFO/vep file.vcf.gz | bcftools view --types snps --regions-file bedfile -o output_file - O z
 ``` 
-
+## view variant positions only
 ```
 bcftools mpileup -f GRCm38_68.19.fa A_J.bam | bcftools call -mv | less -S  #view variant regions only
 ```
 Let mpileup output more information. For example we can ask it to add the FORMAT/AD tag which informs
 about the number of high-quality reads that support alleles listed in REF and ALT columns. The list of all
-available tags can be printed with " bcftools mpileup -a? ".
+available tags can be printed with " bcftools mpileup -a? .
 Now let's run the variant calling again, this time adding the -a AD option. We will also add the -Ou option to
 mpileup so that it streams a binary uncompressed BCF into call . This is to avoid the unnecessary CPU
 overhead of formatting the internal binary format into plain text VCF only to be immediately formatted back to
@@ -66,6 +72,8 @@ Examine the VCF file output using the unix command less :
 less -S out.vcf
 ## Q: What is the reference and SNP base at position 10001994?
 69
+Ref =A
+SNP=G
 
 ## Q: What is the total read depth at position 10001994?
 69
@@ -79,3 +87,18 @@ Insertion in alternate sequence. 5  insetions(
 
 ### Exercise 4: Variant filtering
 In the series of commands we will learn how to filter and extract information from VCFs. Most of the bcftools commands accept the -i, --include and -e, --exclude options (documentation) which will come handy when filtering using fixed thresholds. We will estimate the quality of the callset by calculating the transition/transversion ratio.
+```
+bcftools query -f'POS = %POS\n' out.vcf | head
+```
+```
+bcftools query -f'%POS %REF,%ALT\n' out.vcf | head
+```
+````
+bcftools query -f'%POS %QUAL [%GT %AD] %REF %ALT\n' out.vcf | head
+````
+### reads with quqlity >30 and exclude indels
+```
+bcftools query -f'%POS %QUAL [%GT %AD] %REF %ALT\n' -i'QUAL>=30 && type="snp"' \
+out.vcf | head
+```
+
