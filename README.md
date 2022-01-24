@@ -65,10 +65,16 @@ Now let's run the variant calling again, this time adding the -a AD option. We w
 mpileup so that it streams a binary uncompressed BCF into call . This is to avoid the unnecessary CPU
 overhead of formatting the internal binary format into plain text VCF only to be immediately formatted back to
 the internal binary format again:
+## Best command to generate VCF
 ```
 bcftools mpileup -a AD -f GRCm38_68.19.fa A_J.bam -Ou | bcftools call -mv -o out.vcf
 ```
-Examine the VCF file output using the unix command less :
+## command2 for calling variants: mpileup
+```
+bcftools mpileup -f GRCm38_68.19.fa NZO.bam|bcftools call -mv -Ob -o NZO.vcf #prouces a BCF binary file. use bcftools view
+```
+
+## Examine the VCF file output using the unix command less :
 less -S out.vcf
 ## Q: What is the reference and SNP base at position 10001994?
 69
@@ -87,12 +93,18 @@ Insertion in alternate sequence. 5  insetions(
 
 ### Exercise 4: Variant filtering
 In the series of commands we will learn how to filter and extract information from VCFs. Most of the bcftools commands accept the -i, --include and -e, --exclude options (documentation) which will come handy when filtering using fixed thresholds. We will estimate the quality of the callset by calculating the transition/transversion ratio.
+
+## printing a simple list of positions from the VCF using the bcftools query
+
 ```
 bcftools query -f'POS = %POS\n' out.vcf | head
 ```
+## Now add REF and ALT allele to the output, separated by a comma
+
 ```
 bcftools query -f'%POS %REF,%ALT\n' out.vcf | head
 ```
+
 ````
 bcftools query -f'%POS %QUAL [%GT %AD] %REF %ALT\n' out.vcf | head
 ````
@@ -101,4 +113,13 @@ bcftools query -f'%POS %QUAL [%GT %AD] %REF %ALT\n' out.vcf | head
 bcftools query -f'%POS %QUAL [%GT %AD] %REF %ALT\n' -i'QUAL>=30 && type="snp"' \
 out.vcf | head
 ```
+## Filtering indels
+```
+bcftools query -f'%POS %QUAL [%GT %AD] %REF %ALT\n' -i'QUAL>=30 && type="INDEL"' out.vcf | head
+```
+## Transition/transversion ratio
+```
+bcftools stats out.vcf | grep TSTV | cut -f5
+```
+
 
