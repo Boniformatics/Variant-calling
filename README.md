@@ -117,9 +117,62 @@ out.vcf | head
 ```
 bcftools query -f'%POS %QUAL [%GT %AD] %REF %ALT\n' -i'QUAL>=30 && type="INDEL"' out.vcf | head
 ```
+## Filter reads with atleat 25 alternate reads AD[0-1]
+```
+bcftools query -f'%POS %QUAL [%GT %AD] %REF %ALT\n' -i'QUAL>=30 && type="snp" && AD[0:1-] >= 25' out.vcf | less 
+```
 ## Transition/transversion ratio
 ```
 bcftools stats out.vcf | grep TSTV | cut -f5
 ```
+### Generate bcftools statistics: no of indels,SNPs,Multiallelic
+```
+cftools stats out.vcf
+```
+## ts/tv of reads of QUAL>=30
+ ```
+ bcftools stats -i 'QUAL>=30' out.vcf |grep TSTV | cut -f5
+ 
+ ```
+ ## ts/tv of reads QUAL>=30 && alternate reads >=25
+ ```
+ bcftools stats -i 'QUAL>=30 && AD[0:1-] >= 25' out.vcf |grep TSTV | cut -f5
+ ```
+ ## ts/tv of removed sites
+ ```
+ cftools stats -i 'QUAL<=30 && AD[0:1-] <= 25' out.vcf |grep TSTV | cut -f5
+ ```
+ ## T0 find out what is the ts/tv of heterozyous SNPs?
+Use to select 
+```
+bcftools view -i 'GT="het"'  A_J.vcf
+```
+or to excluse heterozygouus sites by 
+```
+bcftools view -e 'GT="het"'
+```
+### ts/tv of heterozygous sites
+```
+bcftools view -i 'GT="het"' A_J.vcf | bcftools stats |grep TSTV | cut -f5
+```
+### ts/tv of non-heterozygous sites
+```
+bcftools view -e 'GT="het"' A_J.vcf | bcftools stats |grep TSTV | cut -f5
+```
 
+heterozygous genotypes.
+ SNP of removed sites =1.20
+#soft filtering
+```
+ bcftools filter -sLowQual -m+ -i'QUAL>=30 && AD[0:1-]>=25' -g8 -G10 out.vcf -o out.flt.vcf
+ ```
+ ## Multi-sumple variant calling
+ 
+```
+bcftools mpileup -a AD -f GRCm38_68.19.fa A_J.bam NZO.bam -Ou | bcftools call -mv -o multi.vcf
+```
+### Functional annotation
+```
+ bcftools csq -f GRCm38_68.19.fa -g Mus_musculus.part.gff3 multi.vcf -Ob -o annotation.bcf
+ ```
 
